@@ -31,4 +31,10 @@ lazy val scalaTest = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 )
 
-libraryDependencies ++= circe ++ cats ++ jackson ++ scalaTest
+lazy val jsonAssertVersion = "0.0.3"
+
+lazy val jsonAssert = Seq(
+  "com.stephenn" %% "scalatest-json-jsonassert" % jsonAssertVersion % Test,
+)
+
+libraryDependencies ++= circe ++ cats ++ jackson ++ scalaTest ++ jsonAssert
