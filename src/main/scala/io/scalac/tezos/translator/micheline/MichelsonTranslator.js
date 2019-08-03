@@ -1,5 +1,5 @@
 let nearley = require("nearley");
-let Michelson = require("./Michelson2");
+let Michelson = require("./Michelson");
 
 function preProcessMichelsonScript(code) {
     let sections = new Map();
@@ -30,4 +30,6 @@ let input = process.argv[2];
 
 let result = translateMichelsonToMicheline(input);
 
-console.log(result);
+let wrappedMicheline = ` { "script": ${result} } `;
+
+console.log(wrappedMicheline);
