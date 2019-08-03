@@ -25,4 +25,10 @@ lazy val jackson = Seq(
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
 )
 
-libraryDependencies ++= circe ++ cats ++ jackson
+lazy val scalaTestVersion = "3.0.8"
+
+lazy val scalaTest = Seq(
+  "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+)
+
+libraryDependencies ++= circe ++ cats ++ jackson ++ scalaTest
