@@ -3,6 +3,7 @@ package io.scalac.tezos.translator.micheline
 import org.scalatest.{FlatSpec, Matchers}
 
 class MichelineTranslatorSpec extends FlatSpec with Matchers {
+  import MichelineTranslatorSpecHelpers._
 
   "Translator" should "translate Michelson to Micheline" in {
 
@@ -32,7 +33,15 @@ class MichelineTranslatorSpec extends FlatSpec with Matchers {
         |              PAIR}                     # Create the end value
         |""".stripMargin
 
-    MichelineTranslator.michelsonToMicheline(michelson) shouldEqual Right(micheline.replaceAll("\n", " ").replaceAll(" +", " "))
+    MichelineTranslator.michelsonToMicheline(michelson).map(_.noSpaces) shouldEqual Right(micheline.noSpaces)
+  }
+
+}
+
+object MichelineTranslatorSpecHelpers {
+
+  implicit class StringWithNoSpaces(str: String) {
+    def noSpaces: String = str.filterNot((x: Char) => x.isWhitespace)
   }
 
 }
