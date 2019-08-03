@@ -30,6 +30,4 @@ let input = process.argv[2];
 
 let result = translateMichelsonToMicheline(input);
 
-let wrappedMicheline = ` { "script": ${result} } `;
-
-console.log(wrappedMicheline);
+console.log(result);

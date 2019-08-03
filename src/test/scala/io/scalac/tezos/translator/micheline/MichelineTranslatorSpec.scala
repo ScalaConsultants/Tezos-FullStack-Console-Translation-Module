@@ -9,17 +9,16 @@ class MichelineTranslatorSpec extends FlatSpec with Matchers {
 
     val micheline =
       """
-        |{ "script":
-        |      [ { "prim": "parameter", "args": [ { "prim": "int" } ] },
-        |        { "prim": "storage", "args": [ { "prim": "int" } ] },
-        |        { "prim": "code",
-        |          "args":
-        |            [ [ { "prim": "CAR" },
-        |                { "prim": "PUSH",
-        |                  "args": [ { "prim": "int" }, { "int": "1" } ] },
-        |                { "prim": "ADD" },
-        |                { "prim": "NIL", "args": [ { "prim": "operation" } ] },
-        |                { "prim": "PAIR" } ] ] } ] }
+        |[ { "prim": "parameter", "args": [ { "prim": "int" } ] },
+        |  { "prim": "storage", "args": [ { "prim": "int" } ] },
+        |  { "prim": "code",
+        |    "args":
+        |    [ [ { "prim": "CAR" },
+        |        { "prim": "PUSH",
+        |          "args": [ { "prim": "int" }, { "int": "1" } ] },
+        |        { "prim": "ADD" },
+        |        { "prim": "NIL", "args": [ { "prim": "operation" } ] },
+        |        { "prim": "PAIR" } ] ] } ]
         |""".stripMargin
 
     val michelson =
@@ -41,7 +40,7 @@ class MichelineTranslatorSpec extends FlatSpec with Matchers {
 object MichelineTranslatorSpecHelpers {
 
   implicit class StringWithNoSpaces(str: String) {
-    def noSpaces: String = str.filterNot((x: Char) => x.isWhitespace)
+    def noSpaces: String = str.filterNot((c: Char) => c.isWhitespace)
   }
 
 }
