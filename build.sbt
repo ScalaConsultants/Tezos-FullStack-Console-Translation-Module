@@ -1,5 +1,7 @@
 name := "Tezos-FullStack-Console-Translation-Module"
 
+organization := "Scalac"
+
 version := "0.1"
 
 scalaVersion := "2.12.8"
