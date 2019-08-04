@@ -41,7 +41,7 @@ libraryDependencies ++= circe ++ cats ++ jackson ++ scalaTest ++ jsonAssert
 
 publishMavenStyle := true
 
-publishTo := Some(Resolver.file("file",  new File("../mvn-repo")))
+publishTo := Some(Resolver.file("file",  new File("./mvn-repo")))
 
 publishArtifact in Test := false
 

@@ -2,3 +2,7 @@ target
 node_modules
 *.class
 *.log
+
+!/mvn-repo/Scalac/tezos-fullstack-console-translation-module_2.12/0.1/tezos-fullstack-console-translation-module_2.12-0.1.jar
+!/mvn-repo/Scalac/tezos-fullstack-console-translation-module_2.12/0.1/tezos-fullstack-console-translation-module_2.12-0.1-javadoc.jar
+!/mvn-repo/Scalac/tezos-fullstack-console-translation-module_2.12/0.1/tezos-fullstack-console-translation-module_2.12-0.1-sources.jar
