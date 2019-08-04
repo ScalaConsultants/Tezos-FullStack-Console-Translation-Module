@@ -1,6 +1,6 @@
 name := "Tezos-FullStack-Console-Translation-Module"
 
-organization := "Scalac"
+organization := "io.scalac"
 
 version := "0.1"
 
