@@ -144,7 +144,8 @@ code { CAR ;
        PAIR }
 ```
 
-###References
+## References
+
 Conseil repository:
 https://github.com/Cryptonomic/Conseil
 
