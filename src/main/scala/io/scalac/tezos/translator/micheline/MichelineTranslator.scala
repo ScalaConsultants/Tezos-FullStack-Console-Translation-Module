@@ -34,7 +34,9 @@ object MichelineTranslator {
   def michelsonToMicheline(input: String): Either[String, String] = {
     var errorLog: String = ""
     val logger = ProcessLogger(e =>
-      errorLog += e + '\n'
+      if (!e.startsWith("    at ")) {
+        errorLog += e + '\n'
+      }
     )
     val michelsonSource = michelsonFile.getAbsolutePath
     val translatorSource = translatorFile.getAbsolutePath
