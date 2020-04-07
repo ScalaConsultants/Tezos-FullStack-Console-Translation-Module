@@ -39,7 +39,10 @@ lazy val jsonAssert = Seq(
   "com.stephenn" %% "scalatest-json-jsonassert" % jsonAssertVersion % Test,
 )
 
-libraryDependencies ++= circe ++ cats ++ jackson ++ scalaTest ++ jsonAssert
+libraryDependencies ++= circe ++ cats ++ jackson ++ scalaTest ++ jsonAssert ++
+Seq(
+  "org.apache.commons"           % "commons-text"                   % "1.7",
+)
 
 publishMavenStyle := true
 

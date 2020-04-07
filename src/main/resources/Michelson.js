@@ -7,13 +7,13 @@
 
     /*
       Assumptions:
-      - Grammar defined here: http://tezos.gitlab.io/mainnet/whitedoc/michelson.html#xii-full-grammar
+      - Grammar defined here: https://tezos.gitlab.io/whitedoc/michelson.html#full-grammar
       - In lexer, types and instructions may have zero, one, two, or three arguments based on the keyword.
       - Issue: Some keywords like "DIP" can have zero and one arguments, and the lexer is order-dependent from top to bottom.
         This may impact parsing and lead to awkward parse errors, and needs to be addressed accordingly.
       - Issue: Splitting instructions by number of arguments hasn't been done, so certain invalid michelson expressions like
         "PAIR key key {DROP;}" will pass through even though PAIR is a constant expression. This is a false positive.
-      - Issue: Some macros are still not implemented: http://tezos.gitlab.io/mainnet/whitedoc/michelson.html#macros
+      - Issue: Some macros are still not implemented: https://tezos.gitlab.io/whitedoc/michelson.html#macros
       - Issue: There is an ambiguous parsing between commands LE and LEFT.
       - Issue: In general, if you have multiple Michelson instructions in a code block, all of them, no matter how nested,
         need to have a semicolon at the end, unless it's a singleton code block. In regular Michelson, you can have the very
@@ -27,13 +27,13 @@
       - There may not be an exhaustive handling of annotations for types, but it should be covered for instructions
     */
 
-    const macroCADR = /C[AD]+R/;
-    const macroSETCADR = /SET_C[AD]+R/;
-    const macroDIP = /DII+P/;
-    const macroDUP = /DUU+P/;
-    const DIPmatcher = new RegExp(macroDIP);
-    const DUPmatcher = new RegExp(macroDUP);
-    const macroASSERTlist = ['ASSERT', 'ASSERT_EQ', 'ASSERT_NEQ', 'ASSERT_GT', 'ASSERT_LT', 'ASSERT_GE', 'ASSERT_LE', 'ASSERT_NONE', 'ASSERT_SOME', 'ASSERT_LEFT', 'ASSERT_RIGHT', 'ASSERT_CMPEQ', 'ASSERT_CMPNEQ', 'ASSERT_CMPGT', 'ASSERT_CMPLT', 'ASSERT_CMPGE', 'ASSERT_CMPLE'];
+    const macroCADRconst = /C[AD]+R/;
+    const macroSETCADRconst = /SET_C[AD]+R/;
+    const macroDIPconst = /DII+P/;
+    const macroDUPconst = /DUU+P/;
+    const DIPmatcher = new RegExp(macroDIPconst);
+    const DUPmatcher = new RegExp(macroDUPconst);
+    const macroASSERTlistConst = ['ASSERT', 'ASSERT_EQ', 'ASSERT_NEQ', 'ASSERT_GT', 'ASSERT_LT', 'ASSERT_GE', 'ASSERT_LE', 'ASSERT_NONE', 'ASSERT_SOME', 'ASSERT_LEFT', 'ASSERT_RIGHT', 'ASSERT_CMPEQ', 'ASSERT_CMPNEQ', 'ASSERT_CMPGT', 'ASSERT_CMPLT', 'ASSERT_CMPGE', 'ASSERT_CMPLE'];
     const macroIFCMPlist = ['IFCMPEQ', 'IFCMPNEQ', 'IFCMPLT', 'IFCMPGT', 'IFCMPLE', 'IFCMPGE'];
     const macroCMPlist = ['CMPEQ', 'CMPNEQ', 'CMPLT', 'CMPGT', 'CMPLE', 'CMPGE'];
     const macroIFlist = ['IFEQ', 'IFNEQ', 'IFLT', 'IFGT', 'IFLE', 'IFGE'];
@@ -50,12 +50,12 @@
         parameter: [ 'parameter' , 'Parameter'],
         storage: ['Storage', 'storage'],
         code: ['Code', 'code'],
-        comparableType: ['int', 'nat', 'string', 'bytes', 'mutez', 'bool', 'key_hash', 'timestamp'],
+        comparableType: ['int', 'nat', 'string', 'bytes', 'mutez', 'bool', 'key_hash', 'timestamp', 'chain_id'],
         constantType: ['key', 'unit', 'signature', 'operation', 'address'],
         singleArgType: ['option', 'list', 'set', 'contract'],
         doubleArgType: ['pair', 'or', 'lambda', 'map', 'big_map'],
         baseInstruction: ['ABS', 'ADD', 'ADDRESS', 'AMOUNT', 'AND', 'BALANCE', 'BLAKE2B', 'CAR', 'CAST', 'CDR', 'CHECK_SIGNATURE',
-            'COMPARE', 'CONCAT', 'CONS', 'CONTRACT', 'CREATE_ACCOUNT', 'CREATE_CONTRACT', 'DIP', 'DROP', 'DUP', 'EDIV', 'EMPTY_MAP',
+            'COMPARE', 'CONCAT', 'CONS', 'CONTRACT', /*'CREATE_CONTRACT',*/ 'DIP', /*'DROP',*/ 'DUP', 'EDIV', /*'EMPTY_MAP',*/
             'EMPTY_SET', 'EQ', 'EXEC', 'FAIL', 'FAILWITH', 'GE', 'GET', 'GT', 'HASH_KEY', 'IF', 'IF_CONS', 'IF_LEFT', 'IF_NONE',
             'IF_RIGHT', 'IMPLICIT_ACCOUNT', 'INT', 'ISNAT', 'ITER', 'LAMBDA', 'LE', 'LEFT', 'LOOP', 'LOOP_LEFT', 'LSL', 'LSR', 'LT',
             'MAP', 'MEM', 'MUL', 'NEG', 'NEQ', 'NIL', 'NONE', 'NOT', 'NOW', 'OR', 'PACK', 'PAIR', /*'PUSH',*/ 'REDUCE', 'RENAME', 'RIGHT', 'SELF',
@@ -64,13 +64,14 @@
             'UNPAIR', 'UNPAPAIR', // TODO: macro
             'IF_SOME', // TODO: macro
             'IFCMPEQ', 'IFCMPNEQ', 'IFCMPLT', 'IFCMPGT', 'IFCMPLE', 'IFCMPGE', 'CMPEQ', 'CMPNEQ', 'CMPLT', 'CMPGT', 'CMPLE',
-            'CMPGE', 'IFEQ', 'NEQ', 'IFLT', 'IFGT', 'IFLE', 'IFGE' // TODO: should be separate
-        ],
-        macroCADR: macroCADR,
-        macroDIP: macroDIP,
-        macroDUP: macroDUP,
-        macroSETCADR: macroSETCADR,
-        macroASSERTlist: macroASSERTlist,
+            'CMPGE', 'IFEQ', 'NEQ', 'IFLT', 'IFGT', 'IFLE', 'IFGE', // TODO: should be separate
+            /*'DIG',*/ /*'DUG',*/ 'EMPTY_BIG_MAP', 'APPLY', 'CHAIN_ID'
+            ],
+        macroCADR: macroCADRconst,
+        macroDIP: macroDIPconst,
+        macroDUP: macroDUPconst,
+        macroSETCADR: macroSETCADRconst,
+        macroASSERTlist: macroASSERTlistConst,
         constantData: ['Unit', 'True', 'False', 'None', 'instruction'],
         singleArgData: ['Left', 'Right', 'Some'],
         doubleArgData: ['Pair'],
@@ -78,7 +79,6 @@
         word: /[a-zA-Z_0-9]+/,
         string: /"(?:\\["\\]|[^\n"\\])*"/
     });
-
 
     const checkC_R = c_r => {
         var pattern = new RegExp('^C(A|D)(A|D)+R$'); // TODO
@@ -134,7 +134,7 @@
         throw new Error('');
     }
 
-    const check_assert = assert => macroASSERTlist.includes(assert);
+    const check_assert = assert => macroASSERTlistConst.includes(assert);
 
     const expand_assert = (assert, annot) => {
         const annotation = !!annot ? `, "annots": [${annot}]` : '';
@@ -182,7 +182,7 @@
 
     const check_if = ifStatement => (macroIFCMPlist.includes(ifStatement) || macroIFlist.includes(ifStatement) || ifStatement === 'IF_SOME'); // TODO: IF_SOME
 
-    const expandIF = (ifInstr, ifTrue, ifFalse, annot) => {
+    const expandIF = (ifInstr, ifTrue, ifFalse?, annot?) => {
         const annotation = !!annot ? `, "annots": [${annot}]` : '';
 
         switch (ifInstr) {
@@ -219,7 +219,7 @@
 
     const check_dip = dip => DIPmatcher.test(dip);
 
-    const expandDIP = (dip, instruction, annot) => {
+    const expandDIP = (dip, instruction, annot?) => {
         let t = '';
         if (DIPmatcher.test(dip)) {
             const c = dip.length - 2;
@@ -267,7 +267,7 @@
         }
     }
 
-    const checkSetCadr = s => macroSETCADR.test(s);
+    const checkSetCadr = s => macroSETCADRconst.test(s);
 
     const expandSetCadr = (word, annot) => nestSetCadr(word.slice(5, -1));
 
@@ -361,8 +361,8 @@
     }
 
     const singleArgTypeKeywordWithParenToJson = d => {
-        const annot = d[3].map(x => `"${x[1]}"`)
-        return `{ "prim": "${d[2]}", "args": [ ${d[5]} ], "annots": [${annot}]  }`;
+         const annot = d[3].map(x => `"${x[1]}"`)
+         return `{ "prim": "${d[2]}", "args": [ ${d[5]} ], "annots": [${annot}]  }`;
     }
 
     const singleArgInstrKeywordToJson = d => {
@@ -380,21 +380,23 @@
         if (check_dip(word)) {
             return expandDIP(word, d[2], annot)
         } else {
-            return `{ "prim": "${d[0]}", "args": [  ${d[3]}  ], "annots": [${annot}] }`;
+            return `{ "prim": "${d[0]}", "args": [ ${d[3]} ], "annots": [${annot}] }`;
         }
     }
 
     /**
      * Given a keyword with one argument and parentheses, convert it to JSON.
      * Example: "(option int)" -> "{ prim: option, args: [{prim: int}] }"
+     * Also: (option (mutez))
      */
-    const singleArgKeywordWithParenToJson = d => `{ "prim": "${d[2]}", "args": [ ${d[4]} ] }`;
+    const singleArgKeywordWithParenToJson = d => `{ "prim": "${d[2]}", "args": [ ${d[(4 + ((d.length === 7) ? 0 : 2))]} ] }`;
 
     /**
      * Given a keyword with two arguments, convert it into JSON.
      * Example: "Pair unit instruction" -> "{ prim: Pair, args: [{prim: unit}, {prim: instruction}] }"
      */
     const doubleArgKeywordToJson = d => `{ "prim": "${d[0]}", "args": [ ${d[2]}, ${d[4]} ] }`;
+    const doubleArgParenKeywordToJson = d => `{ "prim": "${d[0]}", "args": [ ${d[4]}, ${d[8]} ] }`;
 
     const doubleArgInstrKeywordToJson = d => {
         const word = `${d[0].toString()}`
@@ -470,12 +472,18 @@
         return `{ "prim": "PUSH", "args": [ ${d[3]}, ${d[5]} ], "annots": [${annot}]  }`;
     }
 
+    const dipnToJson = d => (d.length > 4) ? `{ "prim": "${d[0]}", "args": [ { "int": "${d[2]}" }, [ ${d[4]} ] ] }` : `{ "prim": "${d[0]}", "args": [ ${d[2]} ] }`;
+
+    const dignToJson = d => `{ "prim": "${d[0]}", "args": [ { "int": "${d[2]}" } ] }`;
+
+    const dropnToJson = d => `{ "prim": "${d[0]}", "args": [ { "int": "${d[2]}" } ] }`;
+
     const subContractToJson = d => `{ "prim":"CREATE_CONTRACT", "args": [ [ ${d[4]}, ${d[6]}, {"prim": "code" , "args":[ [ ${d[8]} ] ] } ] ] }`;
 
     const instructionListToJson = d => {
-        const instructionOne = [d[2]]
-        const instructionList = d[3].map(x => x[3])
-        return instructionOne.concat(instructionList).map(x => nestedArrayChecker(x))
+        const instructionOne = [d[2]];
+        const instructionList = d[3].map(x => x[3]);
+        return instructionOne.concat(instructionList).map(x => nestedArrayChecker(x));
     }
     var grammar = {
         Lexer: lexer,

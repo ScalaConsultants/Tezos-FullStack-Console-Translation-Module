@@ -1,6 +1,7 @@
 package io.scalac.tezos.translator.michelson.renderer
 
 import io.scalac.tezos.translator.michelson.dto._
+import org.apache.commons.text.StringEscapeUtils.escapeJson
 
 /* Implicitly adds render() methods for domain object representing Michelson Schema */
 object MichelsonRenderer {
@@ -13,12 +14,13 @@ object MichelsonRenderer {
           name,
           List(sequence1: MichelsonInstructionSequence, sequence2: MichelsonInstructionSequence),
           _
-          ) =>
+          ) => {
         val indent = " " * (name.length + 1)
         val embeddedIndent = indent + " " * 2
-  
+
         s"""$name { ${sequence1.instructions.render(embeddedIndent)} }
            |$indent{ ${sequence2.instructions.render(embeddedIndent)} }""".stripMargin
+      }
       case MichelsonSingleInstruction(name, Nil, Nil) => name
       case MichelsonSingleInstruction(name, args, annotations) =>
         s"$name ${(annotations ++ args.map(_.render())).mkString(" ")}"
@@ -29,7 +31,7 @@ object MichelsonRenderer {
       case MichelsonType(name, Nil, Nil) => name
       case MichelsonType(name, args, annotations) => s"($name ${(annotations ++ args.map(_.render())).mkString(" ")})"
       case MichelsonIntConstant(constant) => constant.toString
-      case MichelsonStringConstant(constant) => "\"%s\"".format(constant)
+      case MichelsonStringConstant(constant) => "\"%s\"".format(escapeJson(constant))
       case MichelsonBytesConstant(constant) => s"0x$constant"
       case MichelsonEmptyExpression => "{}"
 
@@ -51,7 +53,7 @@ object MichelsonRenderer {
       self
         .map(_.render())
         .mkString(" ;\n")
-        .lines
+        .linesIterator
         .mkString("\n" + indent)
   }
 }
