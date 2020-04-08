@@ -1,5 +1,5 @@
 let nearley = require("nearley");
-let Michelson = require("./.Michelson");
+let Michelson = require("./Michelson");
 
 function preProcessMichelsonScript(code) {
     let sections = new Map();
@@ -18,7 +18,7 @@ function preProcessMichelsonScript(code) {
 }
 
 function translateMichelsonToMicheline(code) {
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(Michelson));
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(Michelson.default));
     preProcessMichelsonScript(code).forEach(p => {
         parser.feed(p);
 });
