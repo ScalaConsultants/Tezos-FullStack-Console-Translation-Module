@@ -447,7 +447,7 @@ class JsonParserSpec extends FlatSpec with Matchers {
       val json =
         """[{"prim": "parameter", "args": [{"prim": "unit"}]}, {"prim": "storage", "args": [{"prim": "unit"}]}]"""
 
-      parse[MichelsonSchema](json) should equal(Left(ParserError("No code code found")))
+      parse[MichelsonSchema](json) should equal(Left(ParserError("No code section found")))
     }
 
   it should "parse empty schema" in {
