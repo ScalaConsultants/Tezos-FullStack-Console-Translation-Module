@@ -18,7 +18,7 @@ function preProcessMichelsonScript(code) {
 }
 
 function translateMichelsonToMicheline(code) {
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(Michelson));
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(Michelson.default));
     preProcessMichelsonScript(code).forEach(p => {
         parser.feed(p);
 });
