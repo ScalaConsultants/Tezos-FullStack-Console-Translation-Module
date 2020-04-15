@@ -1,12 +1,11 @@
 package io.scalac.tezos.translator.michelson.renderer
 
 import io.scalac.tezos.translator.michelson.dto._
-import org.apache.commons.text.StringEscapeUtils.escapeJson
 
 /* Implicitly adds render() methods for domain object representing Michelson Schema */
 object MichelsonRenderer {
 
-  implicit class MichelsonElementRenderer(val self: MichelsonElement) {
+  implicit class MichelsonElementRenderer(val self: MichelsonElement) extends EscapeJson {
     def render(): String = self match {
 
       // instructions
@@ -30,8 +29,8 @@ object MichelsonRenderer {
       // expressions
       case MichelsonType(name, Nil, Nil) => name
       case MichelsonType(name, args, annotations) => s"($name ${(annotations ++ args.map(_.render())).mkString(" ")})"
-      case MichelsonIntConstant(constant) => constant.toString
-      case MichelsonStringConstant(constant) => "\"%s\"".format(escapeJson(constant))
+      case MichelsonIntConstant(constant) => constant
+      case MichelsonStringConstant(constant) => escapeJsonString(constant)
       case MichelsonBytesConstant(constant) => s"0x$constant"
       case MichelsonEmptyExpression => "{}"
 
