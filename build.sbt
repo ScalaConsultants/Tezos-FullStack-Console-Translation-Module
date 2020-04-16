@@ -1,10 +1,9 @@
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import scalajsbundler.util.JSON._
+import scala.sys.process._
 
-lazy val commonSettings = Seq(
-  organization := "io.scalac",
-  scalaVersion := "2.12.11",
-  version := "0.1"
-)
+lazy val commonSettings =
+  Seq(organization := "io.scalac", scalaVersion := "2.12.11", version := "0.1")
 
 lazy val circeVersion = "0.13.0"
 
@@ -20,7 +19,9 @@ lazy val cats = Seq("org.typelevel" %% "cats-core" % catsVersion)
 
 lazy val scalaTestVersion = "3.1.1"
 
-lazy val scalaTest = Seq("org.scalatest" %% "scalatest" % scalaTestVersion % "test")
+lazy val scalaTest = Seq(
+  "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+)
 lazy val commonsText = Seq("org.apache.commons" % "commons-text" % "1.7")
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
@@ -37,7 +38,27 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     )
   )
   .jvmSettings(libraryDependencies ++= commonsText)
-  .jsSettings(libraryDependencies ++= Seq("io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC5" % Test))
+  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
+  .jsSettings(
+    webpackBundlingMode := BundlingMode.LibraryAndApplication(),
+    npmExtraArgs in Compile := Seq("-silent"),
+    additionalNpmConfig in Compile := Map(
+      "name" -> str("scalac-translator"),
+      "version" -> str("0.1.0")
+    ),
+    libraryDependencies ++= Seq(
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC5" % Test
+    ),
+    buildJS.in(Compile) := {
+      (webpack in (Compile, fullOptJS)).value
+      val buildDir = target.value / "build"
+      s"rm -rf $buildDir" !;
+      s"mkdir $buildDir -p" !;
+      s"cp ${crossTarget.value}/scalajs-bundler/main/package.json             $buildDir/package.json" !;
+      s"cp ${crossTarget.value}/scalajs-bundler/main/${name.value}-opt.js     $buildDir/index.js" !;
+      s"cp ${crossTarget.value}/scalajs-bundler/main/${name.value}-opt.js.map $buildDir/index.js.map" !
+    }
+  )
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
@@ -72,3 +93,5 @@ lazy val root = project
     </developer>
   </developers>
   )
+
+lazy val buildJS = taskKey[Unit]("Prepare a production js build")
