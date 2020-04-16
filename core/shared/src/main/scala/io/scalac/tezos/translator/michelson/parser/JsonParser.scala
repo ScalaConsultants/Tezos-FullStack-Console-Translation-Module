@@ -26,8 +26,7 @@ object JsonParser {
    * */
   sealed trait JsonSection
 
-  case class JsonExpressionSection(prim: String, args: List[JsonExpression])
-      extends JsonSection {
+  case class JsonExpressionSection(prim: String, args: List[JsonExpression]) extends JsonSection {
     def toMichelsonExpression: Option[MichelsonExpression] =
       args.headOption.map(_.toMichelsonExpression)
   }
@@ -81,9 +80,7 @@ object JsonParser {
    * Empty expression is represented as an empty array in JSON.
    *
    * */
-  case class JsonType(prim: String,
-                      args: Option[List[EmbeddedElement]],
-                      annots: Option[List[String]] = None)
+  case class JsonType(prim: String, args: Option[List[EmbeddedElement]], annots: Option[List[String]] = None)
       extends JsonExpression {
     override def toMichelsonExpression =
       MichelsonType(
@@ -108,10 +105,11 @@ object JsonParser {
     def toMichelsonInstruction: MichelsonInstruction
   }
 
-  case class JsonSimpleInstruction(prim: String,
-                                   args: Option[List[EmbeddedElement]] = None,
-                                   annots: Option[List[String]] = None)
-      extends JsonInstruction {
+  case class JsonSimpleInstruction(
+    prim: String,
+    args: Option[List[EmbeddedElement]] = None,
+    annots: Option[List[String]] = None
+  ) extends JsonInstruction {
     override def toMichelsonInstruction =
       MichelsonSingleInstruction(
         name = prim,
@@ -120,8 +118,7 @@ object JsonParser {
       )
   }
 
-  case class JsonInstructionSequence(instructions: List[JsonInstruction])
-      extends JsonInstruction {
+  case class JsonInstructionSequence(instructions: List[JsonInstruction]) extends JsonInstruction {
     override def toMichelsonInstruction =
       MichelsonInstructionSequence(instructions.map(_.toMichelsonInstruction))
   }
@@ -164,26 +161,22 @@ object JsonParser {
     def toMichelsonSchema: Result[MichelsonSchema] =
       for {
         parameter <- extractExpression("parameter")
-        storage <- extractExpression("storage")
-        code <- extractCode
+        storage   <- extractExpression("storage")
+        code      <- extractCode
       } yield MichelsonSchema(parameter, storage, code)
 
     private def extractExpression(
       sectionName: String
     ): Result[MichelsonExpression] =
-      code
-        .collectFirst {
-          case it @ JsonExpressionSection(`sectionName`, _) => it
-        }
-        .flatMap(_.toMichelsonExpression)
+      code.collectFirst {
+        case it @ JsonExpressionSection(`sectionName`, _) => it
+      }.flatMap(_.toMichelsonExpression)
         .toRight(ParserError(s"No expression $sectionName found"))
 
     private def extractCode: Result[MichelsonCode] =
-      code
-        .collectFirst {
-          case it @ JsonCodeSection("code", _) => it.toMichelsonCode
-        }
-        .toRight(ParserError("No code section found"))
+      code.collectFirst {
+        case it @ JsonCodeSection("code", _) => it.toMichelsonCode
+      }.toRight(ParserError("No code section found"))
   }
 
   object GenericDerivation {
@@ -241,9 +234,7 @@ object JsonParser {
 
   implicit val michelsonCodeParser: Parser[MichelsonCode] = {
     import GenericDerivation._
-    decode[List[JsonInstruction]](_).map(
-      instructions => MichelsonCode(instructions.map(_.toMichelsonInstruction))
-    )
+    decode[List[JsonInstruction]](_).map(instructions => MichelsonCode(instructions.map(_.toMichelsonInstruction)))
   }
 
   /* Parses Michelson Expression represented as JSON to domain objects */

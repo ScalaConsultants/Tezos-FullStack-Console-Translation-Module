@@ -1,19 +1,19 @@
 package io.scalac.tezos.translator.micheline
 
-import java.io.{File, PrintWriter}
+import java.io.{ File, PrintWriter }
 
 import scala.io.Source
 import scala.sys.process._
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 object MichelineTranslator {
 
-  val NODE_PATH = "node"
+  val NODE_PATH            = "node"
   val MICHELSON_LEXER_PATH = "src/main/scala/io/scalac/tezos/translator/micheline/MichelsonTranslator.js"
 
   lazy val michelsonSource = Source.fromResource("Michelson.js").mkString
   lazy val michelsonFile = {
-    val file = new File(".Michelson.js")
+    val file   = new File(".Michelson.js")
     val writer = new PrintWriter(file)
     writer.write(michelsonSource)
     writer.close()
@@ -23,7 +23,7 @@ object MichelineTranslator {
 
   lazy val translatorSource = Source.fromResource("MichelsonTranslator.js").mkString
   lazy val translatorFile = {
-    val file = new File(".MichelsonTranslator.js")
+    val file   = new File(".MichelsonTranslator.js")
     val writer = new PrintWriter(file)
     writer.write(translatorSource)
     writer.close()
@@ -38,12 +38,12 @@ object MichelineTranslator {
         errorLog += e + '\n'
       }
     )
-    val michelsonSource = michelsonFile.getAbsolutePath
+    val michelsonSource  = michelsonFile.getAbsolutePath
     val translatorSource = translatorFile.getAbsolutePath
     Try {
       Seq(NODE_PATH, translatorSource, input).!!(logger)
     } match {
-      case Failure(_) => Left(errorLog)
+      case Failure(_)     => Left(errorLog)
       case Success(value) => Right(value)
     }
   }

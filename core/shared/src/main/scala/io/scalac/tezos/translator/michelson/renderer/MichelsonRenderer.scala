@@ -14,7 +14,7 @@ object MichelsonRenderer {
           List(sequence1: MichelsonInstructionSequence, sequence2: MichelsonInstructionSequence),
           _
           ) => {
-        val indent = " " * (name.length + 1)
+        val indent         = " " * (name.length + 1)
         val embeddedIndent = indent + " " * 2
 
         s"""$name { ${sequence1.instructions.render(embeddedIndent)} }
@@ -24,22 +24,22 @@ object MichelsonRenderer {
       case MichelsonSingleInstruction(name, args, annotations) =>
         s"$name ${(annotations ++ args.map(_.render())).mkString(" ")}"
       case MichelsonInstructionSequence(args) => s"{ ${args.map(_.render()).mkString(" ; ")} }"
-      case MichelsonEmptyInstruction => "{}"
+      case MichelsonEmptyInstruction          => "{}"
 
       // expressions
-      case MichelsonType(name, Nil, Nil) => name
+      case MichelsonType(name, Nil, Nil)          => name
       case MichelsonType(name, args, annotations) => s"($name ${(annotations ++ args.map(_.render())).mkString(" ")})"
-      case MichelsonIntConstant(constant) => constant
-      case MichelsonStringConstant(constant) => escapeJsonString(constant)
-      case MichelsonBytesConstant(constant) => s"0x$constant"
-      case MichelsonEmptyExpression => "{}"
+      case MichelsonIntConstant(constant)         => constant
+      case MichelsonStringConstant(constant)      => escapeJsonString(constant)
+      case MichelsonBytesConstant(constant)       => s"0x$constant"
+      case MichelsonEmptyExpression               => "{}"
 
       // code
       case MichelsonCode(instructions) => instructions.render(indent = 7)
 
       // schema
       case MichelsonSchema(MichelsonEmptyExpression, MichelsonEmptyExpression, MichelsonCode(Nil)) => ""
-      case MichelsonSchema(parameter, storage, code) => s"""parameter ${parameter.render()};
+      case MichelsonSchema(parameter, storage, code)                                               => s"""parameter ${parameter.render()};
                                                            |storage ${storage.render()};
                                                            |code { ${code.render()} }""".stripMargin
     }
