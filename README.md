@@ -167,7 +167,7 @@ You can then test the package locally by running following commands in the root 
 ```
 npm install
 node
-require("scalac-translator").Translator.translate("{}")
+require("scalac-tezos-contract-translator").Translator.translate("{}")
 ```
 
 ### Browser Library

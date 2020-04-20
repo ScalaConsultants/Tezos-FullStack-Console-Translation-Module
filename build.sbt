@@ -43,7 +43,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     webpackBundlingMode := BundlingMode.LibraryAndApplication(),
     npmExtraArgs in Compile := Seq("-silent"),
     additionalNpmConfig in Compile := Map(
-      "name" -> str("scalac-translator"),
+      "name" -> str("scalac-tezos-contract-translator"),
       "version" -> str("0.1.0")
     ),
     libraryDependencies ++= Seq(
