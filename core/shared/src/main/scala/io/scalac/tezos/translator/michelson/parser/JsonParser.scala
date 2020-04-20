@@ -157,6 +157,13 @@ object JsonParser {
 
   type Result[T] = Either[Throwable, T]
 
+  case class LambdaForm(code: List[JsonSection])
+
+  implicit val lambdaFormDecoder: Decoder[LambdaForm] = {
+    import GenericDerivation._
+    Decoder.instance(c => c.downArray.downField("code").as[List[JsonSection]].map(LambdaForm))
+  }
+
   case class JsonSchema(code: List[JsonSection]) {
     def toMichelsonSchema: Result[MichelsonSchema] =
       for {
@@ -226,7 +233,9 @@ object JsonParser {
 
   implicit val michelsonSchemaParser: Parser[MichelsonSchema] = {
     import GenericDerivation._
-    decode[List[JsonSection]](_).flatMap {
+
+    val decoder = Decoder[List[JsonSection]].or(lambdaFormDecoder.map(_.code))
+    decode(_)(decoder).flatMap {
       case Nil          => Right(MichelsonSchema.empty)
       case jsonSections => JsonSchema(jsonSections).toMichelsonSchema
     }
